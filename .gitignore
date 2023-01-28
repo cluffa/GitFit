@@ -132,3 +132,4 @@ dmypy.json
 ignore-*
 crossfit-workouts
 .DS_Store
+model_save/
