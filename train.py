@@ -472,14 +472,14 @@ tokenizer.save_pretrained(output_dir)
 
 
 # %%
-!ls -l --block-size=K ./model_save/
+#!ls -l --block-size=K ./model_save/
 
 # %%
-!ls -l --block-size=M ./model_save/pytorch_model.bin
+#!ls -l --block-size=M ./model_save/pytorch_model.bin
 
 # %%
 # Copy the model files to a directory in your Google Drive.
-!cp -r ./model_save/ $data_dir
+#!cp -r ./model_save/ $data_dir
 
 # # Load a trained model and vocabulary that you have fine-tuned
 #model = GPT2LMHeadModel.from_pretrained(output_dir)
