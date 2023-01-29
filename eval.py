@@ -2,7 +2,7 @@ import torch
 from transformers import GPT2LMHeadModel,  GPT2Tokenizer, GPT2Config, GPT2LMHeadModel
 device = "cuda"
 
-output_dir = './model_save/'
+output_dir = './gitfit-model/'
 model = GPT2LMHeadModel.from_pretrained(output_dir)
 tokenizer = GPT2Tokenizer.from_pretrained(output_dir)
 model.to(device)
