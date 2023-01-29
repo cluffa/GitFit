@@ -11,23 +11,24 @@ model.eval()
 
 prompt = "<|startoftext|>"
 
-generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
-generated = generated.to(device)
+def get_workout(n = 1):
+    generated = torch.tensor(tokenizer.encode(prompt)).unsqueeze(0)
+    generated = generated.to(device)
 
-print(generated)
+    sample_outputs = model.generate(
+        generated, 
+        #bos_token_id=random.randint(1,30000),
+        do_sample=True,   
+        top_k=50, 
+        max_length = 256,
+        top_p=0.95, 
+        num_return_sequences=n
+    )
 
-sample_outputs = model.generate(
-    generated, 
-    #bos_token_id=random.randint(1,30000),
-    do_sample=True,   
-    top_k=50, 
-    max_length = 300,
-    top_p=0.95, 
-    num_return_sequences=3
-)
-
-with open("output.txt", "a", encoding="utf-8") as f:
     for i, sample_output in enumerate(sample_outputs):
-        outstr = "---- {} ----\n{}\n\n".format(i, tokenizer.decode(sample_output, skip_special_tokens=True))
-        outstr = outstr.replace("\\n", "\n")
-        print(outstr)
+        outstr = tokenizer.decode(sample_output, skip_special_tokens=True)
+        outstr = outstr.replace("<|newline|>", "\n")
+        print(f"\n{outstr}\n")
+
+if __name__ == "__main__":
+    get_workout(10)
