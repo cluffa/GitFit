@@ -1,3 +1,3 @@
 # GitFit
 GPT2 based crossfit workout generator
-Demo: <https://cluffa.github.io/GitFit/>
+Demo: <https://cluffa-gitfit-workout-generator.hf.space/>
