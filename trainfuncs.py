@@ -117,8 +117,7 @@ def train_model(
     learning_rate = 5e-5,
     warmup_steps = 1e2,
     epsilon = 1e-8,
-    sample_every = 250,
-    prev_stats = []
+    sample_every = 250
     ):
 
     train_size = int(0.95 * len(dataset))
@@ -143,7 +142,7 @@ def train_model(
         
     total_t0 = time.time()
 
-    training_stats = prev_stats
+    training_stats = []
     prev_epochs = len(training_stats)
 
     model = model.to(device)
@@ -201,8 +200,7 @@ def train_model(
 
                 elapsed = format_time(time.time() - t0)
                 eta = format_time((time.time() - t0) * (len(train_dataloader) - step) / step)
-                eta_epoch = format_time((time.time() - t0) * (len(train_dataloader) - step) / step * epochs)
-                print('  Batch {:>5,}  of  {:>5,}. Loss: {:>5,}.   Elapsed: {:}.  Eta: {:} for epoch, {:} for all'.format(step, len(train_dataloader), batch_loss, elapsed, eta, eta_epoch))
+                print('  Batch {:>5,}  of  {:>5,}. Loss: {:>5,}.   Elapsed: {:}.  Eta: {:} for epoch'.format(step, len(train_dataloader), batch_loss, elapsed, eta))
             
             loss.backward()
             optimizer.step()
@@ -268,8 +266,7 @@ def train_model(
                 'Valid. Loss': avg_val_loss,
                 'Training Time': training_time,
                 'Validation Time': validation_time
-            },
-            ignore_index = True
+            }
         )
 
     print("")
