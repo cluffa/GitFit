@@ -301,6 +301,9 @@ def plot_df_stats(df_stats):
     plt.legend()
     #plt.xticks([1, 2, 3, 4])
 
+    # save
+
+    plt.savefig('loss' + int(time.time()) + 'png')
     plt.show()
 
 # %%
