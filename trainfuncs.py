@@ -91,30 +91,8 @@ class GPT2Dataset(Dataset):
     return self.input_ids[idx], self.attn_masks[idx] 
 
 # %%
-def make_dataset(text, tokenizer, batch_size = 8):
-    dataset = GPT2Dataset(text, tokenizer, max_length=256)
-
-    # Split into training and validation sets
-    train_size = int(0.95 * len(dataset))
-    val_size = len(dataset) - train_size
-
-    train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
-
-    print('{:>5,} training samples'.format(train_size))
-    print('{:>5,} validation samples'.format(val_size))
-    train_dataloader = DataLoader(
-        train_dataset,  # The training samples.
-        sampler = RandomSampler(train_dataset), # Select batches randomly
-        batch_size = batch_size # Trains with this batch size.
-    )
-
-    validation_dataloader = DataLoader(
-        val_dataset, # The validation samples.
-        sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
-        batch_size = batch_size # Evaluate with this batch size.
-    )
-
-    return train_dataloader, validation_dataloader
+def make_dataset(text, tokenizer, max_length=256):
+    return GPT2Dataset(text, tokenizer, max_length = max_length)
 
 # %%
 def new_model(model_name = "gpt2", device = device):
@@ -133,8 +111,8 @@ def new_model(model_name = "gpt2", device = device):
 # %%
 def train_model(
     model,
-    train_dataloader,
-    validation_dataloader,
+    dataset,
+    batch_size = 8,
     epochs = 13,
     learning_rate = 5e-5,
     warmup_steps = 1e2,
@@ -143,13 +121,16 @@ def train_model(
     prev_stats = []
     ):
 
+    train_size = int(0.95 * len(dataset))
+    val_size = len(dataset) - train_size
+    
     optimizer = AdamW(
         model.parameters(),
         lr = learning_rate,
         eps = epsilon
     )
 
-    total_steps = len(train_dataloader) * epochs
+    total_steps = train_size * epochs
 
     scheduler = get_linear_schedule_with_warmup(
         optimizer, 
@@ -168,6 +149,19 @@ def train_model(
     model = model.to(device)
 
     for epoch_i in range(0, epochs):
+        train_dataset, val_dataset = random_split(dataset, [train_size, val_size])
+
+        train_dataloader = DataLoader(
+            train_dataset,  # The training samples.
+            sampler = RandomSampler(train_dataset), # Select batches randomly
+            batch_size = batch_size # Trains with this batch size.
+        )
+
+        validation_dataloader = DataLoader(
+            val_dataset, # The validation samples.
+            sampler = SequentialSampler(val_dataset), # Pull out batches sequentially.
+            batch_size = batch_size # Evaluate with this batch size.
+        )
 
         # ========================================
         #               Training
@@ -206,7 +200,9 @@ def train_model(
             if step % sample_every == 0 and not step == 0:
 
                 elapsed = format_time(time.time() - t0)
-                print('  Batch {:>5,}  of  {:>5,}. Loss: {:>5,}.   Elapsed: {:}.'.format(step, len(train_dataloader), batch_loss, elapsed))
+                eta = format_time((time.time() - t0) * (len(train_dataloader) - step) / step)
+                eta_epoch = format_time((time.time() - t0) * (len(train_dataloader) - step) / step * epochs)
+                print('  Batch {:>5,}  of  {:>5,}. Loss: {:>5,}.   Elapsed: {:}.  Eta: {:} for epoch, {:} for all'.format(step, len(train_dataloader), batch_loss, elapsed, eta, eta_epoch))
             
             loss.backward()
             optimizer.step()
@@ -309,7 +305,7 @@ def plot_df_stats(df_stats):
 
 # %%
 def save_model(model, tokenizer, name):
-    output_dir = './gitfit-model' + name + '/'
+    output_dir = './' + name + '/'
 
     # Create output directory if needed
     if not os.path.exists(output_dir):
