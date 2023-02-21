@@ -133,3 +133,4 @@ ignore-*
 crossfit-workouts
 .DS_Store
 gitfit-model*/
+*.png

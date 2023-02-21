@@ -117,10 +117,11 @@ def train_model(
     learning_rate = 5e-5,
     warmup_steps = 1e2,
     epsilon = 1e-8,
-    sample_every = 250
+    sample_every = 250,
+    train_split = 0.9
     ):
 
-    train_size = int(0.95 * len(dataset))
+    train_size = int(train_split * len(dataset))
     val_size = len(dataset) - train_size
     
     optimizer = AdamW(
@@ -300,7 +301,7 @@ def plot_df_stats(df_stats):
 
     # save
 
-    plt.savefig('loss' + int(time.time()) + 'png')
+    plt.savefig('loss.png')
     plt.show()
 
 # %%
